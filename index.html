@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f19">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>ChronyFlex</title>
+<script>try{var s0=JSON.parse(localStorage.getItem('chronyflex_v1'));if(s0&&s0.cfg&&s0.cfg.theme)document.documentElement.dataset.theme=s0.cfg.theme}catch(e){}</script>
+<style>
+:root{
+  --bg:#0b0f19;--card:#131b2e;--sub:#19233a;--line:rgba(255,255,255,.09);--tx:#f8fafc;--mut:#94a3b8;--soft:#64748b;
+  --blue:#3b82f6;--blue-bg:rgba(59,130,246,.12);--blue-bd:rgba(59,130,246,.45);--blue-tx:#93c5fd;
+  --green:#10b981;--green-bg:rgba(16,185,129,.14);--green-bd:rgba(16,185,129,.55);--green-tx:#6ee7b7;
+  --amber:#f59e0b;--amber-bg:rgba(245,158,11,.12);--amber-bd:rgba(245,158,11,.45);--amber-tx:#fcd34d;
+  --red:#e11d48;--red-bg:rgba(244,63,94,.13);--red-bd:rgba(244,63,94,.6);--red-tx:#fda4af;
+  --nav:rgba(11,15,25,.86);--track:#1e293b;color-scheme:dark}
+html[data-theme=light]{
+  --bg:#f1f5f9;--card:#fff;--sub:#f8fafc;--line:#e2e8f0;--tx:#0f172a;--mut:#475569;--soft:#94a3b8;
+  --blue:#2563eb;--blue-bg:#eff6ff;--blue-bd:#93c5fd;--blue-tx:#1d4ed8;
+  --green:#059669;--green-bg:#ecfdf5;--green-bd:#6ee7b7;--green-tx:#047857;
+  --amber:#d97706;--amber-bg:#fffbeb;--amber-bd:#fcd34d;--amber-tx:#b45309;
+  --red:#e11d48;--red-bg:#fff1f2;--red-bd:#fda4af;--red-tx:#be123c;
+  --nav:rgba(255,255,255,.9);--track:#e2e8f0;color-scheme:light}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--tx);font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  padding:calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 86px);transition:background .2s}
+.n{font-variant-numeric:tabular-nums}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.mut{color:var(--mut)}.pos{color:var(--green-tx)}.neg{color:var(--red-tx)}
+.lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+.hint{font-size:12px;color:var(--mut)}
+h2{font-size:15px;font-weight:800}
+
+/* En-tête */
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px}
+.brand b{font-size:19px;font-weight:800;letter-spacing:-.02em}
+.brand div{font-size:12px;color:var(--mut);font-weight:600}
+.hd-r{display:flex;align-items:center;gap:6px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--mut);background:var(--card);border:1px solid var(--line);padding:6px 10px;border-radius:999px;white-space:nowrap}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--soft)}
+.dot.live{background:var(--green);box-shadow:0 0 6px var(--green)}.dot.theo{background:var(--amber)}.dot.demo{background:var(--blue)}.dot.err{background:var(--red)}
+.ibtn{width:34px;height:34px;flex:none;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--tx);display:grid;place-items:center;font-size:15px;cursor:pointer}
+.ibtn svg{width:15px;height:15px}
+.spin svg{animation:sp .7s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+
+/* Cartes */
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.hero{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:end}
+.big{font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1.05;margin-top:4px}
+.big small{font-size:15px;font-weight:700;color:var(--mut);margin-left:8px;letter-spacing:0}
+.tonight{text-align:right}
+.tonight b{display:block;font-size:21px;font-weight:800;margin-top:2px}
+.tonight small{font-size:12px;color:var(--mut);font-weight:600}
+.hero-f{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;color:var(--mut);border-top:1px solid var(--line);padding-top:10px;margin-top:6px}
+.link{background:none;border:0;color:var(--blue-tx);font:inherit;font-weight:700;font-size:13px;cursor:pointer;padding:6px 0;white-space:nowrap}
+.editor{grid-column:1/-1;display:none;flex-direction:column;gap:10px;background:var(--sub);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:4px}
+.editor.on{display:flex}
+
+/* Champs & boutons */
+input,select{font:inherit;font-size:16px;color:var(--tx);background:var(--sub);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-height:44px;outline:none;-webkit-appearance:none;appearance:none}
+input:focus,select:focus{border-color:var(--blue)}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:600;color:var(--mut)}
+.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
+.btn{font:inherit;font-weight:700;font-size:15px;border:0;border-radius:12px;padding:11px 16px;min-height:46px;cursor:pointer;background:var(--blue);color:#fff}
+.btn.ghost{background:var(--sub);color:var(--tx);border:1px solid var(--line)}
+.btn.ok{background:var(--green);color:#fff}
+.btn.sm{min-height:36px;padding:7px 12px;font-size:13px;border-radius:10px}
+.btn.full{width:100%;margin-top:10px}
+.signbtn{flex:0 0 52px;font-size:20px;padding:0}
+.chk{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600}
+.chk input{width:22px;height:22px;min-height:0;padding:0;flex:none;accent-color:var(--blue);-webkit-appearance:auto;appearance:auto}
+
+/* Journée */
+.tiles{display:grid;grid-template-columns:1fr .72fr 1fr;gap:8px}
+.tile{background:var(--sub);border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;transition:background .2s,border-color .2s}
+.tile{min-width:0}
+.tile input{background:transparent;border:0;padding:0;font-size:22px;font-weight:800;min-height:34px;border-radius:0;min-width:0}
+.tile input::-webkit-calendar-picker-indicator{display:none}
+.tile.blue{background:var(--blue-bg);border-color:var(--blue-bd)}.tile.blue .lbl{color:var(--blue-tx)}
+.tile.green{background:var(--green-bg);border-color:var(--green-bd)}.tile.green .lbl{color:var(--green-tx)}
+.tile.amber{background:var(--amber-bg);border-color:var(--amber-bd)}.tile.amber .lbl{color:var(--amber-tx)}
+.tile.red{background:var(--red-bg);border-color:var(--red-bd)}.tile.red .lbl{color:var(--red-tx)}
+.sum{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 10px;font-size:13.5px;font-weight:600;margin-top:10px}
+.done{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px;padding:8px 12px;border-radius:10px;background:var(--green-bg);color:var(--green-tx);font-size:13.5px;font-weight:600}
+
+/* Piste */
+.track{position:relative;height:64px;margin:4px 16px 0}
+.track .bar{position:absolute;left:0;right:0;top:36px;height:8px;border-radius:9px;
+  background:linear-gradient(90deg,var(--track) 0%,#ef4444 42%,#f97316 58%,#eab308 70%,#22c55e 80%,#22c55e 90%,#39ff14 100%)}
+.tick{position:absolute;top:48px;transform:translateX(-50%);font-size:11px;color:var(--mut);font-weight:700}
+.tick::before{content:"";position:absolute;left:50%;top:-16px;width:2px;height:12px;background:var(--tx);opacity:.35;transform:translateX(-50%)}
+.flag{position:absolute;top:4px;font-size:22px;transform:translateX(-25%);transition:left .6s}
+.car{position:absolute;top:6px;font-size:26px;transform:translateX(-50%) scaleX(-1);transition:left 1.2s cubic-bezier(.3,1.3,.5,1);filter:drop-shadow(0 0 7px var(--cc,#ef4444))}
+.car.go{animation:vroom .6s ease}
+@keyframes vroom{50%{transform:translateX(-50%) scaleX(-1) translateY(-4px) rotate(-6deg)}}
+.tmsg{text-align:center;font-weight:700;font-size:14px;margin-top:4px}
+.marks{display:flex;gap:6px;margin-top:12px}
+.mk{flex:1;min-width:0;background:var(--sub);border:1px solid var(--line);border-radius:10px;padding:7px 2px;text-align:center;cursor:pointer;color:var(--tx);font:inherit}
+.mk span{display:block;font-size:10.5px;font-weight:700;color:var(--mut)}
+.mk b{display:block;font-size:14px;font-weight:800;margin:1px 0}
+.mk.tg{background:var(--green-bg);border-color:var(--green-bd)}.mk.tg span{color:var(--green-tx)}
+.mk.on{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
+.mk:disabled{opacity:.35;cursor:default}
+
+/* Alertes */
+#alerts{display:flex;flex-direction:column;gap:8px}#alerts:empty{display:none}
+.al{display:flex;gap:10px;border-radius:14px;padding:12px;border:1px solid;align-items:flex-start;animation:pop .25s ease}
+@keyframes pop{from{transform:scale(.97);opacity:0}}
+.al.bad{background:var(--red-bg);border-color:var(--red-bd)}.al.warn{background:var(--amber-bg);border-color:var(--amber-bd)}.al.info{background:var(--blue-bg);border-color:var(--blue-bd)}
+.al .ic{font-size:20px;line-height:1.2}
+.al b{display:block;font-size:14.5px}
+.al p{font-size:13px;margin-top:3px;opacity:.92}
+.al .btn{margin-top:8px}
+
+/* Trains */
+.tr-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.seg{display:inline-flex;background:var(--sub);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.seg button{font:inherit;font-size:12px;font-weight:700;color:var(--mut);background:none;border:0;border-radius:7px;padding:6px 10px;cursor:pointer}
+.seg button.on{background:var(--blue);color:#fff}
+#trSrc{margin-top:6px}
+.tr{background:var(--sub);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;cursor:pointer;transition:border-color .15s,background .15s}
+.tr.best{border-color:var(--green-bd)}
+.tr.sel{border-color:var(--blue);background:var(--blue-bg)}
+.tr.ko{opacity:.5}
+.tr.cx{background:var(--red-bg);border-color:var(--red-bd);cursor:default}
+.tr.cx .tm{text-decoration:line-through;color:var(--red-tx)}
+.tr-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tm{font-size:17px;font-weight:800}
+.tm s{font-size:12px;color:var(--mut);font-weight:600;margin-left:4px}
+.tm .ar{color:var(--mut);font-weight:600;margin:0 6px}
+.bdg{display:inline-block;font-size:11px;font-weight:800;padding:3px 8px;border-radius:999px;white-space:nowrap;background:var(--card);color:var(--mut);border:1px solid var(--line)}
+.bdg.ok{background:var(--green-bg);color:var(--green-tx);border-color:transparent}
+.bdg.warn{background:var(--amber-bg);color:var(--amber-tx);border-color:transparent}
+.bdg.bad{background:var(--red);color:#fff;border-color:transparent}
+.bdg.info{background:var(--blue-bg);color:var(--blue-tx);border-color:transparent}
+.tr-mid{font-size:12px;color:var(--mut);margin-top:3px;font-weight:600}
+.tr-mid .dly{color:var(--amber-tx)}
+.tr-bot{display:flex;justify-content:space-between;align-items:center;gap:4px 8px;margin-top:7px;font-size:13px;font-weight:600;flex-wrap:wrap}
+.tr-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.tr-foot:empty{display:none}
+.tr-tags{display:flex;gap:5px;flex-wrap:wrap}
+.empty{padding:16px 4px 6px;text-align:center;color:var(--mut);font-size:13.5px}
+
+/* Historique */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--sub);border-radius:12px;padding:10px 6px;text-align:center}
+.stat b{display:block;font-size:18px;font-weight:800;margin:2px 0}
+.stat small{color:var(--mut);font-size:11.5px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut);text-align:left;font-weight:700;padding:0 4px 8px}
+td{padding:9px 4px;border-top:1px solid var(--line);vertical-align:top}
+td small{display:block;color:var(--mut);font-size:11px;font-weight:500}
+tr[data-k]{cursor:pointer}
+tr.old td{opacity:.45}
+.stack{display:flex;flex-direction:column;gap:10px}
+.sug{background:var(--sub);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.sug:empty{display:none}
+.sug div{padding:11px 12px;border-top:1px solid var(--line);cursor:pointer}
+.sug div:first-child{border-top:0}
+
+/* Navigation */
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;background:var(--nav);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:10}
+nav button{flex:1;max-width:186px;background:none;border:0;color:var(--mut);font:inherit;font-size:11px;font-weight:700;padding:9px 0 8px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+nav button i{font-style:normal;font-size:20px;filter:grayscale(1);opacity:.65}
+nav button.on{color:var(--blue-tx)}nav button.on i{filter:none;opacity:1}
+.tab{display:none;flex-direction:column;gap:12px}.tab.on{display:flex}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 80px);transform:translate(-50%,16px);background:#0f172a;color:#fff;border:1px solid rgba(255,255,255,.15);padding:9px 16px;border-radius:999px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:.2s;z-index:20;max-width:92vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media (max-width:370px){.big{font-size:34px}.tile input{font-size:19px}.pill #sync{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><b>⏱️ ChronyFlex</b><div id="route">Luxembourg → Woippy</div></div>
+    <div class="hd-r">
+      <span class="pill n"><span class="dot" id="dot"></span><span id="sync">—</span></span>
+      <button class="ibtn" id="refresh" aria-label="Actualiser les trains"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg></button>
+      <button class="ibtn" id="theme" aria-label="Changer de thème">☀️</button>
+    </div>
+  </header>
+
+  <!-- ============ AUJOURD'HUI ============ -->
+  <section class="tab on" id="t-today">
+    <div id="alerts"></div>
+
+    <div class="card hero">
+      <div><div class="lbl">Solde indicatif</div><div class="big n" id="bal">--</div></div>
+      <div class="tonight"><div class="lbl">Ce soir</div><b class="n" id="tonight">--</b><small class="n" id="tonightH"></small></div>
+      <div class="hero-f"><span id="balInfo"></span><button class="link" id="balEdit">✏️ Modifier</button></div>
+      <div class="editor" id="balEditor">
+        <label class="f">Mon solde d'heures mobiles
+          <div class="row"><button type="button" class="btn ghost signbtn" id="balSign" aria-label="Changer le signe">±</button><input id="balVal" inputmode="decimal" placeholder="6,27" autocomplete="off"></div>
+        </label>
+        <div class="hint n" id="balPreview">En décimal (6,27) ou en heures:minutes (6:16).</div>
+        <label class="f">À jour au soir du<input type="date" id="balDate"></label>
+        <div class="row"><button class="btn ghost" id="balCancel">Annuler</button><button class="btn" id="balSave">Enregistrer</button></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tiles">
+        <label class="tile blue"><span class="lbl">Arrivée</span><input type="time" id="arr" class="n"></label>
+        <label class="tile"><span class="lbl">Pause min</span><input type="number" id="pause" inputmode="numeric" min="0" step="5" class="n"></label>
+        <label class="tile" id="depTile"><span class="lbl">Départ</span><input type="time" id="dep" class="n"></label>
+      </div>
+      <div class="sum n" id="daySum"></div>
+      <div id="depAct"></div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Ma journée</div>
+      <div class="track">
+        <div class="bar"></div>
+        <span class="tick" id="tk0">6h</span><span class="tick" id="tk1">8h</span><span class="tick" id="tk2">10h</span>
+        <span class="flag" id="flag">🏁</span>
+        <span class="car" id="car">🏎️</span>
+      </div>
+      <div class="tmsg" id="tmsg"></div>
+      <div class="marks" id="marks"></div>
+    </div>
+
+    <div class="card">
+      <div class="tr-head">
+        <h2 id="trTitle">🚆 Trains</h2>
+        <div class="seg" id="trSeg"><button data-v="0" class="on">Autour de mon départ</button><button data-v="1">Tous</button></div>
+      </div>
+      <div class="hint" id="trSrc"></div>
+      <div id="trains"></div>
+    </div>
+  </section>
+
+  <!-- ============ HISTORIQUE ============ -->
+  <section class="tab" id="t-hist">
+    <div class="stats">
+      <div class="stat"><small>Semaine</small><b class="n" id="sWeek">--</b><small class="n" id="sWeekH"></small></div>
+      <div class="stat"><small>Mois</small><b class="n" id="sMonth">--</b><small class="n" id="sMonthH"></small></div>
+      <div class="stat"><small>Retards trains</small><b class="n" id="sDelay">--</b><small>ce mois-ci</small></div>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>Jour</th><th>Horaires</th><th>Net</th><th>Écart</th></tr></thead><tbody id="histBody"></tbody></table>
+    </div>
+    <div class="card stack" id="dayForm">
+      <h2>Ajouter ou corriger un jour</h2>
+      <label class="f">Date<input type="date" id="hDate"></label>
+      <div class="row">
+        <label class="f">Arrivée<input type="time" id="hArr"></label>
+        <label class="f">Départ<input type="time" id="hDep"></label>
+      </div>
+      <div class="row">
+        <label class="f">Pause (min)<input type="number" id="hPause" inputmode="numeric" value="30"></label>
+        <label class="f">Retard train (min)<input type="number" id="hDelay" inputmode="numeric" value="0"></label>
+      </div>
+      <div class="row"><button class="btn ghost" id="hDel">Supprimer</button><button class="btn" id="hSave">Enregistrer</button></div>
+    </div>
+  </section>
+
+  <!-- ============ RÉGLAGES ============ -->
+  <section class="tab" id="t-set">
+    <div class="card stack">
+      <h2>🚆 Trajet</h2>
+      <label class="f">Clé API mobiliteit.lu (accessId)<input data-k="key" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="à demander à opendata-api@atp.etat.lu"></label>
+      <div class="hint">Sans clé, l'appli affiche les horaires théoriques vers Woippy (sans retards).</div>
+      <label class="f">Gare de départ<input id="origQ" autocomplete="off" placeholder="Luxembourg"></label><div id="origSug" class="sug"></div>
+      <label class="f">Gare de destination<input id="destQ" autocomplete="off" placeholder="Woippy"></label><div id="destSug" class="sug"></div>
+      <div class="hint" id="stHint"></div>
+      <label class="f">Marche bureau → quai (min)<input type="number" data-k="walk" inputmode="numeric" min="0"></label>
+      <label class="f">Proxy CORS (optionnel)<input data-k="proxy" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://mon-proxy.workers.dev/?url="></label>
+      <label class="chk"><input type="checkbox" data-k="demo"> Mode démo (retards simulés)</label>
+    </div>
+
+    <div class="card stack">
+      <h2>🔔 Alertes</h2>
+      <label class="f">Alerter à partir de (min de retard)<input type="number" data-k="alertMin" inputmode="numeric" min="1"></label>
+      <label class="chk"><input type="checkbox" id="notif"> Notifications sur le téléphone</label>
+      <div class="hint">Retard au départ ou à l'arrivée, train supprimé, « pars dans 10 min ». Sur iPhone : ajoute d'abord l'appli à l'écran d'accueil. Les notifications arrivent tant que l'appli tourne (ouverte ou en arrière-plan récent).</div>
+    </div>
+
+    <div class="card stack">
+      <h2>📏 Règles</h2>
+      <div class="row">
+        <label class="f">Plage début<input type="time" data-k="start"></label>
+        <label class="f">Plage fin<input type="time" data-k="end"></label>
+      </div>
+      <div class="row">
+        <label class="f">Mini (h)<input type="number" data-k="minH" step="0.25"></label>
+        <label class="f">Cible (h)<input type="number" data-k="tgtH" step="0.25"></label>
+        <label class="f">Maxi (h)<input type="number" data-k="maxH" step="0.25"></label>
+      </div>
+      <label class="f">Stratégie
+        <select data-k="mode">
+          <option value="neutre">Neutre : viser la cible chaque jour</option>
+          <option value="lisser">Lisser : ramener le solde vers l'objectif</option>
+        </select>
+      </label>
+      <div class="row">
+        <label class="f">Solde visé (h)<input type="number" data-k="balGoal" step="0.5"></label>
+        <label class="f">Répartir sur (jours)<input type="number" data-k="spread" min="1"></label>
+      </div>
+    </div>
+
+    <div class="card stack">
+      <h2>💾 Sauvegarde</h2>
+      <div class="row">
+        <button class="btn ghost" id="exp">Exporter</button>
+        <label class="btn ghost" style="text-align:center">Importer<input type="file" accept=".json,application/json" id="imp" hidden></label>
+      </div>
+    </div>
+  </section>
+</div>
+
+<nav>
+  <button class="on" data-t="today"><i>🏠</i>Aujourd'hui</button>
+  <button data-t="hist"><i>📊</i>Historique</button>
+  <button data-t="set"><i>⚙️</i>Réglages</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script src="calc.js"></script>
+<script>
+'use strict';
+/* ---------- état ---------- */
+const KEY='chronyflex_v1';
+const DEF={cfg:{key:'',orig:{name:'Luxembourg, Gare Centrale',id:''},dest:{name:'Woippy',id:''},walk:10,proxy:'',demo:false,
+  start:'07:00',end:'20:00',minH:6,tgtH:8,maxH:10,pauseMin:30,mode:'neutre',balGoal:0,spread:5,alertMin:3,notif:false,theme:'dark'},
+  base:{min:0,date:''},days:{}};
+let S=null;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+function normalize(){
+  if(!S||typeof S!=='object')S=structuredClone(DEF);
+  S.cfg=Object.assign({},DEF.cfg,S.cfg);S.days=S.days||{};
+  S.base=S.base||S.sap||{min:0,date:''};delete S.sap;          // ancien nom de champ (V1)
+  if(!S.cfg.dest||!S.cfg.dest.name)S.cfg.dest={name:'Woippy',id:''};
+}
+normalize();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const C=()=>S.cfg;
+
+/* ---------- temps & formats ---------- */
+const{MINUS,toMin,hm,dur,sdur,dec,parseBal}=Calc;                // calc.js (testé)
+const short=n=>String(n||'?').replace(/,?\s*Gare Centrale/i,'').trim();
+const cls=m=>m==null?'':m>=0.5?'pos':m<=-0.5?'neg':'';
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today=()=>iso(new Date());
+const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60};
+const fmtD=d=>new Date(d+'T12:00').toLocaleDateString('fr-FR',{weekday:'short',day:'2-digit',month:'2-digit'});
+const clock=d=>d?d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';
+
+/* ---------- règles métier (calc.js) ---------- */
+const tgtM=()=>C().tgtH*60;
+const effPause=p=>Calc.effPause(p,C());
+const effArr=a=>Calc.effArr(a,C());
+const workOf=(arr,depM,pause)=>Calc.workOf(arr,depM,pause,C());
+const credit=w=>Calc.credit(w,C());
+const dayWork=d=>Calc.dayWork(d,C());
+const balance=skipToday=>Calc.balance(S,today(),skipToday);
+const targetWork=bal=>Calc.targetWork(bal,C());
+const zoneColor=w=>Calc.zoneColor(w,C());
+
+/* ---------- trains ---------- */
+// Grille théorique Luxembourg → Woippy (jours ouvrés), utilisée sans clé API
+const GRID=[['12:15','13:05','88731'],['12:44','13:35','88733'],['13:15','14:05','88735'],['13:44','14:35','88737'],['14:15','15:05','88739'],
+  ['14:44','15:35','88741'],['15:15','16:05','88743'],['15:44','16:35','88745'],['16:15','17:05','88747'],['16:44','17:35','88749'],
+  ['16:57','17:49','88529'],['17:15','18:09','88751'],['17:44','18:35','88753'],['17:57','18:49','88533'],['18:15','19:05','88755'],
+  ['18:44','19:35','88757'],['19:15','20:05','88759'],['19:44','20:35','88761'],['20:15','21:05','88763']];
+const isWoippy=()=>/woippy/i.test(C().dest.name||'');
+const rnd=s=>{let h=2166136261;for(const ch of s){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return((h>>>0)%10000)/10000};
+function gridTrains(demo){
+  const d=today();
+  return GRID.map(([a,b,n],i)=>{
+    const p=toMin(a),q=toMin(b);let dd=0,ad=0,cx=false;
+    if(demo){const r=rnd(d+n);dd=r<.45?0:Math.round((r-.4)*20);ad=dd+(r>.75?3:0);cx=r>.93}
+    return{id:'g'+n,name:'TER '+n,dep:{plan:p,real:p+dd,delay:dd,track:demo?String(1+i%6):''},arr:{plan:q,real:q+ad,delay:ad},changes:0,cancelled:cx};
+  });
+}
+async function api(path,params){
+  const c=C(),u=new URL('https://cdt.hafas.de/opendata/apiserver/'+path);
+  u.search=new URLSearchParams({accessId:c.key,format:'json',lang:'fr',...params});
+  const url=c.proxy?c.proxy+encodeURIComponent(u.toString()):u.toString();
+  const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),15000);
+  try{const r=await fetch(url,{cache:'no-store',signal:ctl.signal});if(!r.ok)throw new Error('HTTP '+r.status);return await r.json()}
+  finally{clearTimeout(to)}
+}
+const list_=x=>x?Array.isArray(x)?x:[x]:[];
+const legTime=p=>Calc.legTime(p,today());
+async function resolveStations(){                            // trouve l'identifiant des gares à partir du nom
+  const c=C();
+  for(const w of['orig','dest']){
+    if(c[w].id||!c[w].name)continue;
+    const j=await api('location.name',{input:c[w].name,type:'S',maxNo:1});
+    const s=list_(j.stopLocationOrCoordLocation).map(x=>x.StopLocation).find(Boolean);
+    if(!s)throw new Error('gare introuvable : '+c[w].name);
+    c[w]={id:s.extId,name:s.name};save();loadForm();
+  }
+}
+async function fetchTrips(){
+  const c=C(),td=S.days[today()]||{};
+  const early=td.arr?effArr(td.arr)+c.minH*60+effPause(td.pause)-c.walk-30:0;
+  let t=Math.max(0,Math.floor(Math.max(nowMin()-60,early)));
+  const res=[];
+  for(let page=0;page<4;page++){
+    const j=await api('trip',{originExtId:c.orig.id,destExtId:c.dest.id,date:today(),time:hm(t),numF:6,numB:0});
+    const got=list_(j.Trip).map(tr=>{
+      const legs=list_(tr.LegList&&tr.LegList.Leg).filter(l=>l.type!=='WALK');
+      if(!legs.length)return null;
+      return{name:legs.map(l=>(l.name||'').trim()).join(' + '),dep:legTime(legs[0].Origin),arr:legTime(legs[legs.length-1].Destination),
+        changes:legs.length-1,cancelled:legs.some(l=>l.cancelled||l.Origin.cancelled||l.Destination.cancelled),id:legs[0].name+'@'+legs[0].Origin.time};
+    }).filter(Boolean);
+    res.push(...got);
+    if(!got.length)break;
+    const last=Math.max(...got.map(x=>x.dep.plan));
+    if(last>=toMin(c.end)+60)break;
+    t=last+1;
+  }
+  const seen=new Set();
+  return res.filter(x=>!seen.has(x.id)&&seen.add(x.id)).sort((a,b)=>a.dep.plan-b.dep.plan);
+}
+let trains=[],lastSync=null,syncErr='',source='',syncing=false;
+async function syncTrains(manual){
+  if(syncing)return;syncing=true;$('refresh').classList.add('spin');
+  const c=C();
+  try{
+    if(c.demo){trains=gridTrains(true);source='demo'}
+    else if(!c.key){trains=isWoippy()?gridTrains(false):[];source='theo'}
+    else{await resolveStations();trains=await fetchTrips();source='live'}
+    lastSync=new Date();syncErr='';
+    const td=S.days[today()];                                 // met à jour le retard du train pris
+    if(td&&td.trainId){const t=trains.find(x=>x.id===td.trainId);if(t){td.delayArr=Math.max(0,t.arr.delay);td.delayDep=Math.max(0,t.dep.delay);save()}}
+    if(manual)toast('Horaires à jour ✓');
+  }catch(e){
+    syncErr=e.name==='AbortError'?'délai dépassé':e instanceof TypeError?'API injoignable (CORS ?) – essaie un proxy':e.message;
+    if(manual)toast('Erreur : '+syncErr);
+  }finally{
+    syncing=false;setTimeout(()=>$('refresh').classList.remove('spin'),300);render();
+  }
+}
+
+/* ---------- notifications ---------- */
+const sent={};
+async function notify(title,body,tag){
+  try{
+    const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();
+    if(r&&r.showNotification)return r.showNotification(title,{body,tag,icon:'icon.svg',badge:'icon.svg'});
+    new Notification(title,{body,tag,icon:'icon.svg'});
+  }catch(e){}
+}
+function notifyCheck(f,now){
+  const c=C();
+  if(!c.notif||!f||typeof Notification==='undefined'||Notification.permission!=='granted')return;
+  const t=f.t,st=sent[t.id]||(sent[t.id]={}),th=c.alertMin;
+  if(t.cancelled){if(!st.cx){st.cx=1;notify('Train supprimé',`${t.name} de ${hm(t.dep.plan)} est supprimé.`,t.id)}return}
+  const dd=t.dep.delay,ad=t.arr.delay;
+  if((dd>=th&&(st.dd==null||dd>=st.dd+3))||(ad>=th&&(st.ad==null||ad>=st.ad+3))){
+    st.dd=dd;st.ad=ad;
+    notify(`Retard : ${t.name} de ${hm(t.dep.plan)}`,`Départ +${dd} min (${hm(t.dep.real)}) · arrivée +${ad} min (${hm(t.arr.real)}). Tu peux rester jusqu'à ${hm(f.out)}.`,t.id);
+  }
+  const left=f.out-now;
+  if(left>0&&left<=10&&!st.leave){st.leave=1;notify(`Pars dans ${Math.ceil(left)} min`,`Pour le ${hm(t.dep.real)} (${t.name}).`,t.id+'-go')}
+}
+
+/* ---------- rendu ---------- */
+let showAll=false,prevW=null,cur={};
+const setVal=(id,v)=>{const e=$(id);if(e!==document.activeElement)e.value=v??''};
+const setHTML=(id,h)=>{const e=$(id);if(e._h!==h){e.innerHTML=h;e._h=h}};   // évite de relancer les animations
+function render(){
+  const c=C(),td=S.days[today()]||{},now=nowMin(),tgt=tgtM();
+  const balNow=balance(),balEx=balance(true),tw=targetWork(balEx);
+  const arr=td.arr||'',p=td.pause??c.pauseMin;
+  const a=arr?effArr(arr):null,pz=effPause(p),endM=toMin(c.end);
+  const depFor=w=>Math.min(endM,a+w+pz);
+  const advised=arr?depFor(tw):null;
+  /* trains : temps travaillé si je prends chacun d'eux */
+  const rows=trains.filter(t=>t.dep.real>=now-2||t.id===td.trainId).map(t=>{
+    const out=t.dep.real-c.walk,w=arr?workOf(arr,out,p):null;
+    const ok=!t.cancelled&&(w==null||(w>=c.minH*60&&w<=c.maxH*60&&out<=endM));
+    return{t,out,w,ok};
+  });
+  const fut=rows.filter(r=>r.t.dep.real>=now-2);
+  const best=!arr?null:fut.find(r=>r.ok&&r.w>=tw-5)||[...fut].reverse().find(r=>r.ok)||null;
+  // départ affiché : enregistré > choisi > train conseillé > cible théorique
+  const planM=td.dep?toMin(td.dep):td.plan?toMin(td.plan):best?best.out:advised;
+  const planW=arr&&planM!=null?workOf(arr,planM,p):null;
+  const ecart=planW!=null?credit(planW)-tgt:null;
+  const tonight=ecart!=null?balEx+ecart:null;
+  cur={planM};
+
+  /* en-tête */
+  const route=short(c.orig.name)+' → '+short(c.dest.name);
+  $('route').textContent=route;$('trTitle').textContent='🚆 '+route;
+  $('dot').className='dot '+(syncErr?'err':source);
+  $('sync').textContent=syncErr?'Hors ligne':source==='live'?'Direct '+clock(lastSync):source==='demo'?'Démo':source==='theo'?'Théorique':'…';
+
+  /* solde */
+  $('bal').innerHTML=`${dec(balNow)}<small>${sdur(balNow)}</small>`;$('bal').className='big n '+cls(balNow);
+  $('tonight').textContent=dec(tonight);$('tonight').className='n '+cls(tonight);
+  $('tonightH').textContent=tonight==null?'saisis ton arrivée':sdur(tonight);
+  $('balInfo').textContent=S.base.date?'Recalé au soir du '+fmtD(S.base.date):'👉 Saisis ton solde pour commencer';
+
+  /* journée */
+  setVal('arr',arr);setVal('pause',p);setVal('dep',planM!=null?hm(planM):'');
+  $('depTile').className='tile '+(planW==null?'':planW<c.minH*60?'red':planW<tgt-2?'amber':'green');
+  let note='';
+  if(planW!=null&&planW>c.maxH*60)note=' · plafonné à '+dur(c.maxH*60);
+  if(planM!=null&&planM>endM)note+=' · rien après '+c.end;
+  $('daySum').innerHTML=planW==null?'<span class="mut">Saisis ton heure d\'arrivée pour calculer ta journée.</span>'
+    :`<span>${dur(credit(planW))} nettes · <span class="${cls(ecart)}">${dec(ecart)} (${sdur(ecart)})</span>${note}</span><span class="mut">Quai à ${hm(planM+c.walk)}</span>`;
+  $('depAct').innerHTML=!arr?'':td.dep
+    ?`<div class="done n"><span>✓ Départ enregistré à <b>${esc(td.dep)}</b>${td.train?' · '+esc(td.train):''}</span><button class="link" data-act="undo">Annuler</button></div>`
+    :`<button class="btn ghost full n" data-act="rec">Enregistrer mon départ à ${hm(planM)}</button>`;
+
+  /* piste 🏎️ → 🏁 */
+  const maxM=c.maxH*60,pct=m=>Math.max(0,Math.min(100,m/maxM*100))+'%';
+  [c.minH,c.tgtH,c.maxH].forEach((h,i)=>{const e=$('tk'+i);e.style.left=pct(h*60);e.textContent=dur(h*60).replace('h00','h')});
+  $('flag').style.left=pct(tw);
+  const wNow=arr?workOf(arr,td.dep?Math.min(now,toMin(td.dep)):now,p):null;
+  const car=$('car');
+  if(wNow==null){car.style.left='0%';car.style.setProperty('--cc','#64748b');$('tmsg').innerHTML='<span class="mut">Saisis ton arrivée pour lancer la course</span>'}
+  else{
+    const col=zoneColor(wNow);car.style.left=pct(wNow);car.style.setProperty('--cc',col);
+    const msg=td.dep&&now>=toMin(td.dep)?`Journée terminée : ${dur(credit(wNow))} nettes`
+      :wNow<c.minH*60?`Encore ${dur(c.minH*60-wNow)} avant le minimum`
+      :wNow<tw?`${dur(tw-wNow)} avant l'arrivée 🏁`
+      :wNow<maxM?`Arrivée atteinte ! Encore ${dur(maxM-wNow)} avant le maximum`:'Maximum atteint 🏆';
+    $('tmsg').innerHTML=`<span style="color:${col}">${msg}</span>`;
+    if(prevW!=null&&prevW<tw&&wNow>=tw){car.classList.remove('go');void car.offsetWidth;car.classList.add('go');try{navigator.vibrate&&navigator.vibrate([90,60,90])}catch(e){}toast('🏁 Arrivée atteinte !')}
+    prevW=wNow;
+  }
+  /* repères cliquables : au plus tôt, cible, au plus tard */
+  if(!arr)$('marks').innerHTML='';
+  else{
+    const pts=[c.minH*60,c.minH*60+60,c.maxH*60-60,c.maxH*60].filter(m=>Math.abs(m-tw)>=20);pts.push(tw);
+    $('marks').innerHTML=[...new Set(pts)].sort((x,y)=>x-y).map(m=>{
+      const raw=a+m+pz,d=depFor(m),isMax=m===c.maxH*60,off=raw>endM&&!isMax&&m!==tw;
+      const w=workOf(arr,d,p),on=planM!=null&&Math.abs(planM-d)<=2;
+      return `<button class="mk n ${m===tw?'tg':''} ${on?'on':''}" data-m="${d}" ${off?'disabled':''}><span>${m===tw?'🏁 ':''}${dur(m).replace('h00','h')}</span><b>${hm(d)}</b><span>${dec(credit(w)-tgt)}</span></button>`;
+    }).join('');
+  }
+
+  /* trains */
+  const chosen=td.trainId||td.follow||'';
+  const f=rows.find(r=>r.t.id===(chosen||(best&&best.t.id)))||null;
+  let vis=rows;
+  if(!showAll&&rows.length>5){
+    const q=planM!=null?planM+c.walk:now;let bi=0,bd=1e9;
+    rows.forEach((r,i)=>{const d=Math.abs(r.t.dep.real-q);if(d<bd){bd=d;bi=i}});
+    const s=Math.max(0,Math.min(rows.length-5,bi-2));vis=rows.slice(s,s+5);
+    [f,best].forEach(x=>{if(x&&!vis.includes(x))vis.push(x)});vis.sort((x,y)=>x.t.dep.plan-y.t.dep.plan);
+  }
+  $('trSeg').children[1].textContent='Tous ('+rows.length+')';
+  [...$('trSeg').children].forEach((b,i)=>b.classList.toggle('on',(i===1)===showAll));
+  $('trSrc').textContent=syncErr?'⚠️ '+syncErr+(trains.length?' · dernières données affichées':'')
+    :source==='live'?`Temps réel · mis à jour à ${lastSync.toLocaleTimeString('fr-FR')} · toutes les minutes`
+    :source==='demo'?'Mode démo : retards et suppressions simulés'
+    :source==='theo'?(isWoippy()?'Horaires théoriques (jours ouvrés, sans retards). Ajoute ta clé API pour le temps réel.':'')
+    :'';
+  let html='';
+  if(!rows.length){
+    html=`<div class="empty">${source==='theo'&&!isWoippy()?'Ajoute ta clé API dans Réglages pour voir les trains.':syncErr&&!trains.length?'Impossible de charger les trains.':trains.length?'Plus de train aujourd\'hui 🌙':'Chargement…'}</div>`;
+  }else html=vis.map(r=>{
+    const t=r.t,dd=t.dep.delay,ad=t.arr.delay,worst=Math.max(dd,ad);
+    const isB=best&&t.id===best.t.id,isF=chosen&&t.id===chosen,taken=t.id===td.trainId;
+    const e=r.w!=null?credit(r.w)-tgt:null;
+    const badge=t.cancelled?'<span class="bdg bad">Supprimé</span>'
+      :worst>0?`<span class="bdg ${worst>=c.alertMin?'bad':'warn'}">+${worst} min</span>`
+      :source==='theo'?'<span class="bdg">Prévu</span>':'<span class="bdg ok">À l\'heure</span>';
+    const why=!r.ok&&!t.cancelled&&r.w!=null?(r.w<c.minH*60?'moins de '+c.minH+'h':r.out>endM?'après '+c.end:'plus de '+c.maxH+'h'):'';
+    const tags=(isB?'<span class="bdg ok">★ Conseillé</span>':'')+(taken?'<span class="bdg ok">✓ Pris</span>':isF?'<span class="bdg info">Suivi</span>':'')+(why?`<span class="bdg">${why}</span>`:'');
+    const act=taken?'<button class="link" data-act="undo">Annuler</button>'
+      :isF&&r.ok&&!td.trainId&&now<r.out+c.walk?`<button class="btn ok sm" data-take="${esc(t.id)}">Je prends celui-ci</button>`:'';
+    return `<div class="tr ${isB?'best':''} ${isF?'sel':''} ${why?'ko':''} ${t.cancelled?'cx':''}" data-id="${esc(t.id)}">
+      <div class="tr-top"><div class="tm n">${hm(t.dep.real)}${dd?`<s>${hm(t.dep.plan)}</s>`:''}<span class="ar">→</span>${hm(t.arr.real)}${ad?`<s>${hm(t.arr.plan)}</s>`:''}</div>${badge}</div>
+      <div class="tr-mid n">${esc(t.name)}${t.dep.track?' · voie '+esc(t.dep.track):''}${t.changes?` · ${t.changes} corresp.`:''} · ${t.arr.plan-t.dep.plan} min${worst>0&&!t.cancelled?` · <span class="dly">départ ${dd>0?'+'+dd:'à l\'heure'}, arrivée ${ad>0?'+'+ad:'à l\'heure'}</span>`:''}</div>
+      ${r.w!=null&&!t.cancelled?`<div class="tr-bot n"><span>Dépointer <b>${hm(r.out)}</b> · ${dur(credit(r.w))} · <span class="${cls(e)}">${dec(e)}</span></span><span class="mut">solde ${dec(balEx+e)}</span></div>`:''}
+      <div class="tr-foot">${tags||act?`<div class="tr-tags">${tags}</div>${act}`:''}</div>
+    </div>`;
+  }).join('');
+  $('trains').innerHTML=html;
+
+  /* alertes du train suivi (ou conseillé) */
+  const al=[];
+  if(f&&now<f.t.arr.real){
+    const t=f.t,dd=t.dep.delay,ad=t.arr.delay,th=c.alertMin,lbl=`${t.name} de ${hm(t.dep.plan)}`;
+    if(t.cancelled){
+      const nx=fut.find(r=>r.ok&&r.t.dep.real>t.dep.plan);
+      al.push({k:'bad',ic:'✕',t:`${lbl} supprimé`,p:[nx?`Prochain train possible : ${hm(nx.t.dep.real)}, dépointer à ${hm(nx.out)}.`:'Aucun autre train compatible aujourd\'hui.'],btn:nx&&[`Suivre le ${hm(nx.t.dep.real)}`,nx.t.id]});
+    }else{
+      if(dd>=th||ad>=th){
+        const p=[];
+        if(dd>=th)p.push(`Départ ${hm(t.dep.real)} au lieu de ${hm(t.dep.plan)}${t.dep.track?', voie '+t.dep.track:''}. Tu peux rester jusqu'à ${hm(f.out)}.`);
+        if(ad>=th)p.push(`Arrivée à ${short(c.dest.name)} ${hm(t.arr.real)} au lieu de ${hm(t.arr.plan)} (+${ad} min).`);
+        al.push({k:Math.max(dd,ad)>=10?'bad':'warn',ic:'🚨',t:dd>=th?`${lbl} : +${dd} min au départ`:`${lbl} : +${ad} min à l'arrivée`,p});
+      }
+      const left=f.out-now;
+      if(left>0&&left<=10)al.push({k:'info',ic:'⏰',t:`Pars dans ${Math.ceil(left)} min`,p:[`Pour le ${hm(t.dep.real)} (${t.name}).`]});
+      else if(left<=0&&now<t.dep.real&&!td.dep)al.push({k:'warn',ic:'🏃',t:'Pars maintenant !',p:[`Le ${hm(t.dep.real)} part dans ${Math.ceil(t.dep.real-now)} min.`]});
+    }
+  }
+  setHTML('alerts',al.map(x=>`<div class="al ${x.k}"><div class="ic">${x.ic}</div><div><b>${esc(x.t)}</b><p class="n">${x.p.map(esc).join('<br>')}</p>${x.btn?`<button class="btn sm" data-follow="${esc(x.btn[1])}">${esc(x.btn[0])}</button>`:''}</div></div>`).join(''));
+  notifyCheck(f,now);
+}
+
+function renderHist(){
+  const tgt=tgtM(),ks=Object.keys(S.days).sort().reverse();
+  const now=new Date(),mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));
+  const wk=iso(mon),mo=today().slice(0,7);let w=0,m=0,dl=0;
+  $('histBody').innerHTML=ks.map(k=>{
+    const d=S.days[k],wd=dayWork(d),e=wd!=null?credit(wd)-tgt:null;
+    if(e!=null){if(k>=wk)w+=e;if(k.startsWith(mo))m+=e}
+    if(k.startsWith(mo))dl+=+d.delayArr||0;
+    return `<tr data-k="${k}" class="${S.base.date&&k<=S.base.date?'old':''}">
+      <td>${fmtD(k)}${d.train?`<small>🚆 ${esc(d.train)}${d.delayArr?' · +'+d.delayArr+' min':''}</small>`:''}</td>
+      <td class="n">${esc(d.arr||'--')} – ${esc(d.dep||'--')}<small>pause ${effPause(d.pause)} min</small></td>
+      <td class="n">${dur(credit(wd))}</td>
+      <td class="n ${cls(e)}">${dec(e)}<small>${e!=null?sdur(e):''}</small></td></tr>`;
+  }).join('')||'<tr><td colspan="4" class="mut">Aucun jour enregistré pour l\'instant.</td></tr>';
+  $('sWeek').textContent=dec(w);$('sWeek').className='n '+cls(w);$('sWeekH').textContent=sdur(w);
+  $('sMonth').textContent=dec(m);$('sMonth').className='n '+cls(m);$('sMonthH').textContent=sdur(m);
+  $('sDelay').textContent=dl+' min';
+}
+
+/* ---------- actions ---------- */
+let toastT;
+function toast(msg){const e=$('toast');e.textContent=msg;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),2600)}
+function setToday(patch,resync){
+  const d=Object.assign({pause:C().pauseMin},S.days[today()],patch);
+  for(const k in d)if(d[k]===''||d[k]==null)delete d[k];
+  S.days[today()]=d;save();render();if(resync)syncTrains();
+}
+function setPlan(m,follow){
+  if((S.days[today()]||{}).dep)return toast('Annule d\'abord le départ enregistré');
+  setToday({plan:hm(m),follow:follow||''});
+}
+function takeTrain(id){
+  const t=trains.find(x=>x.id===id);if(!t)return;
+  setToday({dep:hm(t.dep.real-C().walk),plan:'',follow:id,train:t.name+' '+hm(t.dep.plan),trainId:id,delayArr:Math.max(0,t.arr.delay),delayDep:Math.max(0,t.dep.delay)});
+  toast('Bon retour ! Départ enregistré à '+hm(t.dep.real-C().walk));
+}
+function undoDep(){setToday({dep:'',train:'',trainId:'',delayArr:'',delayDep:''});toast('Départ annulé')}
+
+$('arr').addEventListener('change',e=>setToday({arr:e.target.value},true));
+$('pause').addEventListener('change',e=>setToday({pause:Math.max(0,+e.target.value||0)}));
+$('dep').addEventListener('change',e=>{if(!e.target.value)return;(S.days[today()]||{}).dep?setToday({dep:e.target.value}):setToday({plan:e.target.value,follow:''})});
+$('t-today').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act],[data-take],[data-follow],[data-m],.tr');if(!b)return;
+  if(b.dataset.act==='rec'){setToday({dep:hm(cur.planM)});toast('Départ enregistré ✓')}
+  else if(b.dataset.act==='undo')undoDep();
+  else if(b.dataset.take)takeTrain(b.dataset.take);
+  else if(b.dataset.follow){const t=trains.find(x=>x.id===b.dataset.follow);if(t)setPlan(t.dep.real-C().walk,t.id)}
+  else if(b.dataset.m)setPlan(+b.dataset.m,'');
+  else if(b.dataset.id){const t=trains.find(x=>x.id===b.dataset.id);if(t&&!t.cancelled)setPlan(t.dep.real-C().walk,t.id)}
+});
+$('trSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(b){showAll=b.dataset.v==='1';render()}});
+$('refresh').onclick=()=>syncTrains(true);
+function applyTheme(){
+  const t=C().theme;document.documentElement.dataset.theme=t;
+  $('theme').textContent=t==='dark'?'☀️':'🌙';
+  document.querySelector('meta[name=theme-color]').content=t==='dark'?'#0b0f19':'#f1f5f9';
+}
+$('theme').onclick=()=>{C().theme=C().theme==='dark'?'light':'dark';save();applyTheme()};
+
+/* solde : saisie en décimal ou h:mm */
+function balPreview(){const v=parseBal($('balVal').value);$('balPreview').textContent=v==null?'En décimal (6,27) ou en heures:minutes (6:16).':`= ${dec(v)} h · ${sdur(v)}`}
+$('balEdit').onclick=()=>{
+  const ed=$('balEditor');ed.classList.toggle('on');if(!ed.classList.contains('on'))return;
+  const b=balance(true);$('balVal').value=dec(b).replace('+','').replace(MINUS,'-');
+  $('balDate').value=iso(new Date(Date.now()-864e5));balPreview();$('balVal').focus();
+};
+$('balVal').addEventListener('input',balPreview);
+$('balSign').onclick=()=>{const e=$('balVal');e.value=e.value.trim().startsWith('-')?e.value.trim().slice(1):'-'+e.value.trim().replace(/^\+/,'');balPreview()};
+$('balCancel').onclick=()=>$('balEditor').classList.remove('on');
+$('balSave').onclick=()=>{
+  const v=parseBal($('balVal').value);if(v==null)return toast('Format non reconnu (ex : 6,27 ou 6:16)');
+  S.base={min:v,date:$('balDate').value||today()};save();$('balEditor').classList.remove('on');render();renderHist();
+  toast('Solde enregistré : '+dec(v)+' ('+sdur(v)+')');
+};
+
+/* historique */
+$('histBody').addEventListener('click',e=>{const r=e.target.closest('tr[data-k]');if(!r)return;const k=r.dataset.k,d=S.days[k];
+  $('hDate').value=k;$('hArr').value=d.arr||'';$('hDep').value=d.dep||'';$('hPause').value=d.pause??30;$('hDelay').value=d.delayArr||0;
+  $('dayForm').scrollIntoView({behavior:'smooth'})});
+$('hSave').onclick=()=>{const k=$('hDate').value;if(!k)return toast('Choisis une date');
+  S.days[k]=Object.assign(S.days[k]||{},{arr:$('hArr').value,dep:$('hDep').value,pause:+$('hPause').value||0,delayArr:+$('hDelay').value||0});
+  save();renderHist();render();toast('Jour enregistré ✓')};
+$('hDel').onclick=()=>{const k=$('hDate').value;if(!k||!S.days[k])return toast('Aucun jour à cette date');
+  if(confirm('Supprimer le '+fmtD(k)+' ?')){delete S.days[k];save();renderHist();render();toast('Jour supprimé')}};
+
+/* réglages : enregistrement automatique */
+function loadForm(){
+  const c=C();
+  document.querySelectorAll('[data-k]').forEach(e=>{if(e===document.activeElement)return;const v=c[e.dataset.k];if(e.type==='checkbox')e.checked=!!v;else e.value=v??''});
+  setVal('origQ',c.orig.name);setVal('destQ',c.dest.name);
+  $('notif').checked=c.notif&&typeof Notification!=='undefined'&&Notification.permission==='granted';
+  $('stHint').textContent=c.key?(c.orig.id&&c.dest.id?'✓ Gares reconnues par l\'API':'Les gares seront recherchées automatiquement'):'';
+  $('hDate').value=$('hDate').value||today();
+}
+document.querySelectorAll('[data-k]').forEach(e=>e.addEventListener('change',()=>{
+  const k=e.dataset.k;C()[k]=e.type==='checkbox'?e.checked:e.type==='number'?+e.value:e.value.trim();
+  save();if(['key','proxy','demo','walk'].includes(k))syncTrains();render();toast('Réglage enregistré ✓');
+}));
+let stT;
+['orig','dest'].forEach(w=>{
+  const q=$(w+'Q'),box=$(w+'Sug');
+  q.addEventListener('input',()=>{clearTimeout(stT);stT=setTimeout(async()=>{
+    if(q.value.length<3||!C().key){box.innerHTML='';return}
+    try{const j=await api('location.name',{input:q.value,type:'S',maxNo:6});
+      box.innerHTML=list_(j.stopLocationOrCoordLocation).map(x=>x.StopLocation).filter(Boolean)
+        .map(s=>`<div data-id="${esc(s.extId)}" data-name="${esc(s.name)}">${esc(s.name)}</div>`).join('');
+    }catch(e){box.innerHTML=`<div class="neg">${esc(e.message)}</div>`}},350)});
+  q.addEventListener('change',()=>{setTimeout(()=>{if(q.value.trim()&&q.value.trim()!==C()[w].name){C()[w]={name:q.value.trim(),id:''};save();loadForm();syncTrains()}},250)});
+  box.addEventListener('click',e=>{const d=e.target.closest('[data-id]');if(!d)return;C()[w]={id:d.dataset.id,name:d.dataset.name};q.value=d.dataset.name;box.innerHTML='';save();loadForm();syncTrains()});
+});
+$('notif').addEventListener('change',async e=>{
+  if(!e.target.checked){C().notif=false;save();return}
+  if(typeof Notification==='undefined'){e.target.checked=false;return toast('Notifications indisponibles ici (sur iPhone : installe l\'appli d\'abord)')}
+  const p=await Notification.requestPermission();
+  if(p!=='granted'){e.target.checked=false;C().notif=false;save();return toast('Autorisation refusée')}
+  C().notif=true;save();notify('ChronyFlex','Alertes de retard activées ✓','test');
+});
+$('exp').onclick=()=>{const b=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='chronyflex-'+today()+'.json';a.click()};
+$('imp').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;
+  f.text().then(t=>{const d=JSON.parse(t);if(!d||!d.days)throw new Error();if(!confirm('Remplacer toutes tes données par ce fichier ?'))return;
+    S=d;normalize();save();loadForm();applyTheme();render();renderHist();syncTrains();toast('Données importées ✓')}).catch(()=>toast('Fichier invalide'));e.target.value=''});
+
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button,.tab').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');$('t-'+b.dataset.t).classList.add('on');scrollTo(0,0);
+  if(b.dataset.t==='hist')renderHist();if(b.dataset.t==='set')loadForm();
+});
+
+/* ---------- boucle ---------- */
+applyTheme();loadForm();render();syncTrains();
+setInterval(syncTrains,60000);                                // trains toutes les minutes
+setInterval(render,15000);                                    // piste et alertes
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncTrains()});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
